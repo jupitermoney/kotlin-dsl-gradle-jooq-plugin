@@ -1,13 +1,12 @@
 package com.rohanprabhu.gradle.plugins.kdjooq
 
-import nu.studer.gradle.util.Objects
+import com.rohanprabhu.gradle.plugins.kdjooq.util.Objects
 import org.gradle.api.Action
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.*
 import org.gradle.process.ExecResult
 import org.gradle.process.JavaExecSpec
-import org.jooq.Constants
 import org.jooq.codegen.GenerationTool
 import org.jooq.meta.jaxb.Configuration
 import java.io.File
@@ -54,8 +53,12 @@ open class JooqCodeGenerationTask : DefaultTask() {
         project.file(jooqConfiguration.configuration.generator.target.directory)
 
     private fun writeConfigFile(file: File) {
+        val xsdCodegenVersion = Class.forName("org.jooq.Constants")
+                .getDeclaredField("XSD_CODEGEN")
+                .get(null)
+
         val schema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI)
-            .newSchema(GenerationTool::class.java.getResource("/xsd/${Constants.XSD_CODEGEN}"))
+            .newSchema(GenerationTool::class.java.getResource("/xsd/${xsdCodegenVersion}"))
 
         val marshaller = JAXBContext.newInstance(Configuration::class.java).let {
             it.createMarshaller().apply { setSchema(schema) }
